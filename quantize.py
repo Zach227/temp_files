@@ -37,10 +37,10 @@ class CustomImageDataset(Dataset):
         img_path = os.path.join(self.img_dir, img_filename)
         label_path = os.path.join(self.label_dir, label_filename)
 
-        img_res = read_image(img_path)
-        img_res = torchvision.transforms.Resize((self.width, self.height))(img_res)
-        img_res = img_res.float()  # uint8 to fp16/32
-        img_res /= 255  # 0 - 255 to 0.0 - 1.0
+        image = read_image(img_path)
+        image = torchvision.transforms.Resize((self.width, self.height))(image)
+        image = image.float()  # uint8 to fp16/32
+        image /= 255  # 0 - 255 to 0.0 - 1.0
 
         boxes_array = []
         labels_array = []
@@ -71,11 +71,11 @@ class CustomImageDataset(Dataset):
         target["image_id"] = img_id
 
         if self.transforms:
-            sample = self.transform(image=img_res, bboxes=target["boxes"], labels=labels_tensor)
-            img_res = sample['image']
+            sample = self.transform(image=image, bboxes=target["boxes"], labels=labels_tensor)
+            image = sample['image']
             target['boxes'] = torch.Tensor(sample['bboxes'])
 
-        return img_res, target
+        return image, target
 
 def xywh2xyxy(x):
     # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
